@@ -11,3 +11,6 @@ app.use(express.json());
 // app.use('/', auth, privateRoutes);
 
 app.listen(8000, console.log('Server Online'));
+
+// luiizhalexandretti
+// QGB71vEb5D5IE1xq
