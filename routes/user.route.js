@@ -1,11 +1,15 @@
 import express from 'express';
-import userController from '../controllers/users/public.js'
+import userPublicController from '../controllers/users/public.js'
+import userPrivateController from '../controllers/users/private.js'
+
+import auth from '../middlewares/auth.js';
 
 const router = express.Router();
 
-// User routes
-router.post('/create', userController.createUser);
-router.post('/login', userController.loginUser);
-// router.get('/list', userController.listUsers);
+router.post('/create', userPublicController.createUser);
+router.post('/login', userPublicController.loginUser);
+router.post('/find', auth, userPrivateController.findUser);
+
+router.get('/list', auth, userPrivateController.listUsers);
 
 export default router

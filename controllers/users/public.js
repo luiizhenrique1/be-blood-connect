@@ -11,16 +11,27 @@ const createUser = async (req, res) => {
     try {
         const user = req.body;
 
+        const findUser = await prisma.user.findUnique({
+            where: { email: user.email }
+        });
+
+        if (findUser) {
+            return res.status(401).json({ message: 'User already exists.' });
+        }
+
         const salt = await bcrypt.genSalt(10);
         const hashPassword = await bcrypt.hash(user.password, salt);
 
+
         const result = await prisma.user.create({
-            email: user.email,
-            name: user.name,
-            password: hashPassword,
-            role: user.role,
-            location: user.location,
-            bloodGroup: user?.bloodGroup || null
+            data: {
+                email: user.email,
+                name: user.name,
+                password: hashPassword,
+                role: user.role,
+                location: user.location,
+                bloodGroup: user?.bloodGroup || null
+            }
         });
 
         res.status(200).json(result);
@@ -41,14 +52,14 @@ const loginUser = async (req, res) => {
 
         // check if exists
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: 'User not found.' });
         }
 
         // compare the db password with the input
         const isMatch = await bcrypt.compare(userInfo.password, user.password);
 
         if (!isMatch) {
-            return res.status(400).json({ message: 'Wrong password' });
+            return res.status(400).json({ message: 'Wrong password.' });
         }
 
         // generate jwt token
