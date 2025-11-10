@@ -15,17 +15,16 @@ const listUsers = async (req, res) => {
 
 const findUser = async (req, res) => {
     try {
-        const user = req.body;
+        const findEmail = req.query?.email,
+            foundUser = await prisma.user.findUnique({
+                where: { email: findEmail }
+            })
 
-        const findUser = await prisma.user.findUnique({
-            where: { email: user.email }
-        })
-
-        if (!findUser) {
+        if (!foundUser) {
             return res.status(400).json({ message: 'User not found.' });
         }
 
-        res.status(200).json({ message: 'User found.', findUser });
+        return res.status(200).json(foundUser);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server failed.' });
