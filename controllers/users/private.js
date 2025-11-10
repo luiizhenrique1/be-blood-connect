@@ -24,23 +24,24 @@ const listUsers = async (req, res) => {
     }
 }
 
-const findUser = async (req, res) => {
+const getUser = async (req, res) => {
     try {
-        const findEmail = req.query?.email,
-            foundUser = await prisma.user.findUnique({
-                where: {
-                    email: findEmail
-                }
-            });
+        const { email } = req.params;
 
-        if (!foundUser) {
-            return res.status(400).json({ message: 'User not found.' });
+        const user = await prisma.user.findUnique({
+            where: { email: email }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: 'Usuário não encontrado' });
         }
 
-        return res.status(200).json(foundUser);
+        const { password, ...safeUser } = user;
+
+        return res.status(200).json(safeUser);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server failed.' });
+        console.error('Erro ao buscar usuário:', error);
+        return res.status(500).json({ message: 'Erro interno do servidor' });
     }
 }
 
@@ -94,4 +95,4 @@ const reactivateUser = async (req, res) => {
     }
 }
 
-export default { listUsers, findUser, deactivateUser, reactivateUser }
+export default { listUsers, getUser, deactivateUser, reactivateUser }

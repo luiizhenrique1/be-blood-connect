@@ -72,7 +72,8 @@ const loginUser = async (req, res) => {
                 role: user.role,
                 location: user.location,
                 bloodGroup: user.bloodGroup,
-                isAdmin: user.isAdmin
+                isAdmin: user.isAdmin,
+                active: user.active
             }, JWT_SECRET, { expiresIn: '1h' }
         );
 

@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post('/create', userPublicController.createUser);
 router.post('/login', userPublicController.loginUser);
-router.get('/find', auth, verifyRole('DONOR'), userPrivateController.findUser);
+router.get('/:email', auth, userPrivateController.getUser);
 
 // router.post('/create-blood-request', auth, verifyRole(['HOSPITAL'], userPrivateController.createBloodRequest));
 // router.get('/get-nearby-requests', verifyRole(['DONOR']), userPrivateController.getNearbyRequests);
