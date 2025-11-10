@@ -4,7 +4,18 @@ const prisma = new PrismaClient();
 
 const listUsers = async (req, res) => {
     try {
-        const users = await prisma.user.findMany({ omit: { password: true } });
+        const users = await prisma.user.findMany({
+            where: {
+                active: true
+            },
+            select: {
+                name: true,
+                hospitalName: true,
+                email: true,
+
+            },
+            orderBy: { name: 'asc' }
+        });
 
         res.status(200).json({ message: 'Users listed.', users });
     } catch (err) {
@@ -13,22 +24,75 @@ const listUsers = async (req, res) => {
     }
 }
 
-const findUser = async (req, res) => {
+const getUser = async (req, res) => {
     try {
-        const findEmail = req.query?.email,
-            foundUser = await prisma.user.findUnique({
-                where: { email: findEmail }
-            })
+        const { email } = req.params;
 
-        if (!foundUser) {
-            return res.status(400).json({ message: 'User not found.' });
+        const user = await prisma.user.findUnique({
+            where: { email: email }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: 'Usuário não encontrado' });
         }
 
-        return res.status(200).json(foundUser);
+        const { password, ...safeUser } = user;
+
+        return res.status(200).json(safeUser);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server failed.' });
+        console.error('Erro ao buscar usuário:', error);
+        return res.status(500).json({ message: 'Erro interno do servidor' });
     }
 }
 
-export default { listUsers, findUser }
+const deactivateUser = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await prisma.user.findUnique({
+            where: { email }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        await prisma.user.update({
+            where: { email },
+            data: {
+                active: false,
+            },
+        });
+
+        return res.status(200).json({ message: 'User deleted successfully.' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Server failed.', error });
+    }
+};
+
+const reactivateUser = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await prisma.user.findUnique({
+            where: { email }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        await prisma.user.update({
+            where: { email },
+            data: {
+                active: true,
+            },
+        });
+
+        return res.status(200).json({ message: 'User activated successfully.' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Server failed.', error });
+    }
+}
+
+export default { listUsers, getUser, deactivateUser, reactivateUser }
