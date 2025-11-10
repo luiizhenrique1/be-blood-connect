@@ -30,7 +30,8 @@ const createUser = async (req, res) => {
                 role: user.role,
                 location: user.location,
                 bloodGroup: user?.bloodGroup || null,
-                isAdmin: user.isAdmin
+                isAdmin: user.isAdmin,
+                active: true
             }
         });
 
@@ -72,7 +73,7 @@ const loginUser = async (req, res) => {
                 location: user.location,
                 bloodGroup: user.bloodGroup,
                 isAdmin: user.isAdmin
-            }, JWT_SECRET, { expiresIn: '15m' }
+            }, JWT_SECRET, { expiresIn: '1h' }
         );
 
         res.status(200).json(token);
