@@ -11,10 +11,14 @@ const auth = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token.replace('Bearer ', ''), JWT_SECRET);
+
+        if (!decoded?.active) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+
         req.user = decoded;
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Server Error' });
+        return res.status(500).json({ message: 'Server Error', error });
     }
 
     next();

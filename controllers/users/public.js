@@ -30,7 +30,8 @@ const createUser = async (req, res) => {
                 role: user.role,
                 location: user.location,
                 bloodGroup: user?.bloodGroup || null,
-                isAdmin: user.isAdmin
+                isAdmin: user.isAdmin,
+                active: true
             }
         });
 
@@ -43,11 +44,12 @@ const createUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const userInfo = req.body,
-            user = await prisma.user.findUnique({
-                // find the user inside the db
-                where: { email: userInfo.email }
-            });
+        const userInfo = req.body;
+
+        // find the user inside the db
+        const user = await prisma.user.findUnique({
+            where: { email: userInfo.email }
+        });
 
         // check if exists
         if (!user) {
@@ -63,7 +65,16 @@ const loginUser = async (req, res) => {
 
         // generate jwt token
         const token = jwt.sign(
-            { id: user.id, name: user.name, email: user.email, role: user.role, location: user.location, bloodGroup: user.bloodGroup, isAdmin: user.isAdmin }, JWT_SECRET, { expiresIn: '15m' }
+            {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                location: user.location,
+                bloodGroup: user.bloodGroup,
+                isAdmin: user.isAdmin,
+                active: user.active
+            }, JWT_SECRET, { expiresIn: '1h' }
         );
 
         res.status(200).json(token);
