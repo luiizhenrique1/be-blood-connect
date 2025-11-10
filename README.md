@@ -9,8 +9,8 @@ Built using **Node.js**, **Express**, **Prisma**, and **MongoDB**.
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/blood-connect-backend.git
-   cd blood-connect-backend
+   git clone https://github.com/luiizhenrique1/be-blood-connect.git
+   cd be-blood-connect
    ```
 
 2. **Install dependencies:**
