@@ -9,18 +9,17 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 const createUser = async (req, res) => {
     try {
-        const user = req.body;
-
-        const findUser = await prisma.user.findUnique({
-            where: { email: user.email }
-        });
+        const user = req.body,
+            findUser = await prisma.user.findUnique({
+                where: { email: user.email }
+            });
 
         if (findUser) {
             return res.status(401).json({ message: 'User already exists.' });
         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hash(user.password, salt);
+        const salt = await bcrypt.genSalt(10),
+            hashPassword = await bcrypt.hash(user.password, salt);
 
 
         const result = await prisma.user.create({
@@ -30,7 +29,8 @@ const createUser = async (req, res) => {
                 password: hashPassword,
                 role: user.role,
                 location: user.location,
-                bloodGroup: user?.bloodGroup || null
+                bloodGroup: user?.bloodGroup || null,
+                isAdmin: user.isAdmin
             }
         });
 
@@ -43,12 +43,11 @@ const createUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const userInfo = req.body;
-
-        // find the user inside the db
-        const user = await prisma.user.findUnique({
-            where: { email: userInfo.email }
-        });
+        const userInfo = req.body,
+            user = await prisma.user.findUnique({
+                // find the user inside the db
+                where: { email: userInfo.email }
+            });
 
         // check if exists
         if (!user) {
@@ -64,7 +63,7 @@ const loginUser = async (req, res) => {
 
         // generate jwt token
         const token = jwt.sign(
-            { id: user.id, name: user.name, role: user.role, location: user.location, bloodGroup: user.bloodGroup }, JWT_SECRET, { expiresIn: '15m' }
+            { id: user.id, name: user.name, email: user.email, role: user.role, location: user.location, bloodGroup: user.bloodGroup, isAdmin: user.isAdmin }, JWT_SECRET, { expiresIn: '15m' }
         );
 
         res.status(200).json(token);
