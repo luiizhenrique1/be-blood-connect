@@ -43,11 +43,12 @@ const createUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const userInfo = req.body,
-            user = await prisma.user.findUnique({
-                // find the user inside the db
-                where: { email: userInfo.email }
-            });
+        const userInfo = req.body;
+
+        // find the user inside the db
+        const user = await prisma.user.findUnique({
+            where: { email: userInfo.email }
+        });
 
         // check if exists
         if (!user) {
